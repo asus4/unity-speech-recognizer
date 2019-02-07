@@ -13,6 +13,7 @@
 		783C5AE8220CCF130039FC28 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 783C5AE7220CCF130039FC28 /* Assets.xcassets */; };
 		783C5AEB220CCF130039FC28 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 783C5AE9220CCF130039FC28 /* LaunchScreen.storyboard */; };
 		783C5AEE220CCF130039FC28 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 783C5AED220CCF130039FC28 /* main.m */; };
+		783C5AF6220CD25F0039FC28 /* UnitySpeechRecognizerPlugin.mm in Sources */ = {isa = PBXBuildFile; fileRef = 783C5AF5220CD25F0039FC28 /* UnitySpeechRecognizerPlugin.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,8 @@
 		783C5AEA220CCF130039FC28 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		783C5AEC220CCF130039FC28 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		783C5AED220CCF130039FC28 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		783C5AF4220CD25F0039FC28 /* UnitySpeechRecognizerPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnitySpeechRecognizerPlugin.h; sourceTree = "<group>"; };
+		783C5AF5220CD25F0039FC28 /* UnitySpeechRecognizerPlugin.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = UnitySpeechRecognizerPlugin.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +70,8 @@
 				783C5AE9220CCF130039FC28 /* LaunchScreen.storyboard */,
 				783C5AEC220CCF130039FC28 /* Info.plist */,
 				783C5AED220CCF130039FC28 /* main.m */,
+				783C5AF4220CD25F0039FC28 /* UnitySpeechRecognizerPlugin.h */,
+				783C5AF5220CD25F0039FC28 /* UnitySpeechRecognizerPlugin.mm */,
 			);
 			path = SpeechRecognizerNative;
 			sourceTree = "<group>";
@@ -141,6 +146,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				783C5AF6220CD25F0039FC28 /* UnitySpeechRecognizerPlugin.mm in Sources */,
 				783C5AE3220CCF120039FC28 /* ViewController.m in Sources */,
 				783C5AEE220CCF130039FC28 /* main.m in Sources */,
 				783C5AE0220CCF120039FC28 /* AppDelegate.m in Sources */,
