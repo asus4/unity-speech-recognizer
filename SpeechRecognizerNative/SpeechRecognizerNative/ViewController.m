@@ -14,7 +14,6 @@ typedef void (*SpeechRecognizerRequestCallback)(int status);
 int _unitySpeechRecognizerAuthorizationStatus();
 void _unitySpeechRecognizerRequestAuthorization(SpeechRecognizerRequestCallback callback);
 
-
 void _SpeechRecognizerRequestCallback(int status) {
     NSLog(@"statsu callback : %i", status);
 }
@@ -45,7 +44,16 @@ void _SpeechRecognizerRequestCallback(int status) {
 
 
 - (IBAction)onToggleStart:(id)sender {
-    NSLog(@"Start");
+    if(self.speechRecognizer.isRunning) {
+        [self.speechRecognizer stop];
+    } else {
+        [self.speechRecognizer start:^(NSString * _Nonnull result) {
+            NSLog(@"result: %@", result);
+            self.resultTextView.text = result;
+        }];
+    }
+    
+    NSLog(@"Start : running : %i ", self.speechRecognizer.isRunning);
 }
 
 @end
