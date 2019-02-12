@@ -9,6 +9,9 @@
 #import "UnitySpeechRecognizerPlugin.h"
 #import <Speech/Speech.h>
 
+#define MakeStringCopy( _x_ ) ( _x_ != NULL && [_x_ isKindOfClass:[NSString class]] ) ? strdup( [_x_ UTF8String] ) : NULL
+
+
 @interface UnitySpeechRecognizerPlugin () <SFSpeechRecognizerDelegate> {
     SFSpeechRecognizer* speechRecognizer;
     SFSpeechAudioBufferRecognitionRequest* speechRequest;
@@ -61,25 +64,40 @@ static UnitySpeechRecognizerPlugin * _shared;
 
 - (void)start:(void(^)(NSString *))callback {
     NSLog(@"start");
+    if(_isRunning) {
+        return;
+    }
     _isRunning = YES;
     
     [audioEngine prepare];
     [audioEngine startAndReturnError:nil];
     
-    recognazationTask = [speechRecognizer recognitionTaskWithRequest:speechRequest resultHandler:^(SFSpeechRecognitionResult *result, NSError * error) {
+    recognazationTask = [speechRecognizer recognitionTaskWithRequest:speechRequest resultHandler:^(SFSpeechRecognitionResult *result, NSError * error)
+    {
+        BOOL isFinal = NO;
         if(result) {
             callback(result.bestTranscription.formattedString);
+            isFinal = result.isFinal;
+        }
+        if(error || isFinal) {
+            if(error.code != 216) {
+                NSLog(@"error: %@ %@", error, error.localizedDescription);
+            }
+            [self stop];
         }
     }];
 }
 
 - (void)stop {
     NSLog(@"stop");
+    if(!_isRunning) {
+        return;
+    }
     _isRunning = NO;
     
-    [audioEngine stop];
-    [speechRequest endAudio];
     [recognazationTask cancel];
+    [speechRequest endAudio];
+    [audioEngine stop];
     recognazationTask = nil;
 }
 
@@ -93,6 +111,7 @@ static UnitySpeechRecognizerPlugin * _shared;
 
 extern "C" {
     typedef void (*SpeechRecognizerRequestCallback)(int status);
+    typedef void (*SpeechRecognizerResultCallback)(const char *);
     
     void _unitySpeechRecognizerRequestAuthorization(SpeechRecognizerRequestCallback callback) {
         [SFSpeechRecognizer requestAuthorization:^(SFSpeechRecognizerAuthorizationStatus status) {
@@ -102,5 +121,20 @@ extern "C" {
     
     int _unitySpeechRecognizerAuthorizationStatus() {
         return [SFSpeechRecognizer authorizationStatus];
+    }
+    
+    void _unitySpeechRecognizerSetLocale(const char* locale) {
+        [UnitySpeechRecognizerPlugin.shared setLocale:[NSString stringWithUTF8String:locale]];
+    }
+    
+    void _unitySpeechRecognizerStart(SpeechRecognizerResultCallback callback) {
+        [UnitySpeechRecognizerPlugin.shared start:^(NSString * _Nonnull result) {
+            callback(MakeStringCopy(result));
+            //callback(result.UTF8String);
+        }];
+    }
+    
+    void _unitySpeechRecognizerStop() {
+        [UnitySpeechRecognizerPlugin.shared stop];
     }
 }

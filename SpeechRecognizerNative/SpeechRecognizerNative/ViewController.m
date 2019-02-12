@@ -11,11 +11,18 @@
 #import "UnitySpeechRecognizerPlugin.h"
 
 typedef void (*SpeechRecognizerRequestCallback)(int status);
+typedef void (*SpeechRecognizerResultCallback)(const char *);
 int _unitySpeechRecognizerAuthorizationStatus();
 void _unitySpeechRecognizerRequestAuthorization(SpeechRecognizerRequestCallback callback);
+void _unitySpeechRecognizerStart(SpeechRecognizerResultCallback callback);
+void _unitySpeechRecognizerStop();
 
 void _SpeechRecognizerRequestCallback(int status) {
-    NSLog(@"statsu callback : %i", status);
+    NSLog(@"status callback : %i", status);
+}
+
+void _SpeechRecognizerResultCallback(const char * result) {
+    NSLog(@"result callback : %@", [NSString stringWithUTF8String:result]);
 }
 
 @interface ViewController ()
@@ -45,12 +52,14 @@ void _SpeechRecognizerRequestCallback(int status) {
 
 - (IBAction)onToggleStart:(id)sender {
     if(self.speechRecognizer.isRunning) {
-        [self.speechRecognizer stop];
+//        [self.speechRecognizer stop];
+        _unitySpeechRecognizerStop();
     } else {
-        [self.speechRecognizer start:^(NSString * _Nonnull result) {
-            NSLog(@"result: %@", result);
-            self.resultTextView.text = result;
-        }];
+//        [self.speechRecognizer start:^(NSString * _Nonnull result) {
+//            NSLog(@"result: %@", result);
+//            self.resultTextView.text = result;
+//        }];
+        _unitySpeechRecognizerStart(_SpeechRecognizerResultCallback);
     }
     
     NSLog(@"Start : running : %i ", self.speechRecognizer.isRunning);
