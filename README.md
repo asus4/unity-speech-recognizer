@@ -1,4 +1,8 @@
+Unity Speech Recognizer
+===
+
+iOS Speech Recognizer for Unity
 
 
-Available Locale list
-https://gist.github.com/jacobbubu/1836273
+
+- Available Locales: https://gist.github.com/jacobbubu/1836273
