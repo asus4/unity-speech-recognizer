@@ -1,7 +1,7 @@
 {
     "name": "com.github.asus4.unity-speech-recognizer",
     "displayName": "iOS Speech Recognizer",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "unity": "2018.3",
     "description": "Support using iOS Speech Recognizer from Unity.",
     "dependencies": { }
