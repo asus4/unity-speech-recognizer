@@ -71,6 +71,7 @@ static UnitySpeechRecognizerPlugin * _shared;
     }
     _isRunning = YES;
     
+    // Make audio session
     NSError *err;
     AVAudioSession* audioSession = [AVAudioSession sharedInstance];
     [audioSession setCategory:AVAudioSessionCategoryRecord error:&err];
@@ -86,7 +87,6 @@ static UnitySpeechRecognizerPlugin * _shared;
     {
         BOOL isFinal = NO;
         if(result) {
-//            NSLog(@"result: %@", result.bestTranscription.formattedString);
             callback(result.bestTranscription.formattedString);
             isFinal = result.isFinal;
         }
@@ -98,8 +98,9 @@ static UnitySpeechRecognizerPlugin * _shared;
         }
     }];
     
-    // ???
-//    AVAudioFormat* recordingFormat = [audioEngine.inputNode outputFormatForBus:0];
+    // Start audio engine
+    // Have to change audio format for recognition : 24000 Hz, 1channels
+    // AVAudioFormat* recordingFormat = [audioEngine.inputNode outputFormatForBus:0];
     AVAudioFormat* recordingFormat = [[AVAudioFormat alloc] initStandardFormatWithSampleRate:24000 channels:1];
     [audioEngine.inputNode installTapOnBus:0
                                 bufferSize:1024
@@ -107,7 +108,6 @@ static UnitySpeechRecognizerPlugin * _shared;
                                      block:^(AVAudioPCMBuffer* buffer, AVAudioTime* when) {
         [self->recognitionRequest appendAudioPCMBuffer:buffer];
     }];
-    
     [audioEngine prepare];
     [audioEngine startAndReturnError:nil];
 }
