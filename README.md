@@ -1,8 +1,13 @@
 Unity Speech Recognizer
 ===
 
-iOS Speech Recognizer for Unity
+iOS Speech Recognizer for Unity.
 
+## Requirement
+
+- Works only on iOS Device. Not on UnityEditor
+- iOS Version 10.0 or more.
+  
 
 
 ## Installaiton
