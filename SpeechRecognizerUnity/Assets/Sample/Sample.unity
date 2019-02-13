@@ -190,7 +190,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 13993649}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 503111499}
+        m_MethodName: OnClickStartButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &13993649
@@ -442,6 +453,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67c722147b5eb4033a889127a904c213, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resultText: {fileID: 1994062754}
+  buttonLabel: {fileID: 48044974}
+  locale: ja-JP
 --- !u!4 &503111500
 Transform:
   m_ObjectHideFlags: 0
