@@ -14,8 +14,8 @@
 
 @interface UnitySpeechRecognizerPlugin () <SFSpeechRecognizerDelegate> {
     SFSpeechRecognizer* speechRecognizer;
-    SFSpeechAudioBufferRecognitionRequest* speechRequest;
-    SFSpeechRecognitionTask* recognazationTask;
+    SFSpeechAudioBufferRecognitionRequest* recognitionRequest;
+    SFSpeechRecognitionTask* recognitionTask;
     AVAudioEngine *audioEngine;
     
     BOOL _isRunning;
@@ -38,15 +38,13 @@ static UnitySpeechRecognizerPlugin * _shared;
 - (id) init {
     if (self = [super init])
     {
-        audioEngine = [AVAudioEngine new];
-        if( audioEngine.inputNode ){
-            [audioEngine.inputNode installTapOnBus:0 bufferSize:1024 format:nil block:^(AVAudioPCMBuffer* buffer, AVAudioTime* when) {
-                [self->speechRequest appendAudioPCMBuffer:buffer];
-            }];
+        audioEngine = [[AVAudioEngine alloc] init];
+        if(audioEngine.inputNode == nil) {
+            [NSException raise:@"Initialize error" format:@"No audio engine input"];
+            return nil;
         }
-        speechRequest = [[SFSpeechAudioBufferRecognitionRequest alloc]init];
-        speechRequest.shouldReportPartialResults = YES;
-        NSLog(@"initializedddddddd");
+        recognitionRequest = [[SFSpeechAudioBufferRecognitionRequest alloc]init];
+        recognitionRequest.shouldReportPartialResults = YES;
     }
     return self;
 }
@@ -57,27 +55,38 @@ static UnitySpeechRecognizerPlugin * _shared;
     }
 }
 
-
 - (void)setLocale: (NSString*)locale {
-    NSLog(@"set locale with %@", locale);
     speechRecognizer = [[SFSpeechRecognizer alloc]initWithLocale:[NSLocale localeWithLocaleIdentifier:locale]];
     speechRecognizer.delegate = self;
 }
 
 - (void)start:(void(^)(NSString *))callback {
-    NSLog(@"start");
+    // Error checks
+    if(!speechRecognizer) {
+        [NSException raise:@"Initialize error" format:@"Call SetLocale before start"];
+        return;
+    }
     if(_isRunning) {
         return;
     }
     _isRunning = YES;
     
-    [audioEngine prepare];
-    [audioEngine startAndReturnError:nil];
+    NSError *err;
+    AVAudioSession* audioSession = [AVAudioSession sharedInstance];
+    [audioSession setCategory:AVAudioSessionCategoryRecord error:&err];
+    assert(err == nil);
+    [audioSession setMode:AVAudioSessionModeMeasurement error:&err];
+    assert(err == nil);
+    [audioSession setActive:YES
+                withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation
+                      error:&err];
+    assert(err == nil);
     
-    recognazationTask = [speechRecognizer recognitionTaskWithRequest:speechRequest resultHandler:^(SFSpeechRecognitionResult *result, NSError * error)
+    recognitionTask = [speechRecognizer recognitionTaskWithRequest:recognitionRequest resultHandler:^(SFSpeechRecognitionResult *result, NSError * error)
     {
         BOOL isFinal = NO;
         if(result) {
+//            NSLog(@"result: %@", result.bestTranscription.formattedString);
             callback(result.bestTranscription.formattedString);
             isFinal = result.isFinal;
         }
@@ -88,23 +97,40 @@ static UnitySpeechRecognizerPlugin * _shared;
             [self stop];
         }
     }];
+    
+    // ???
+//    AVAudioFormat* recordingFormat = [audioEngine.inputNode outputFormatForBus:0];
+    AVAudioFormat* recordingFormat = [[AVAudioFormat alloc] initStandardFormatWithSampleRate:24000 channels:1];
+    [audioEngine.inputNode installTapOnBus:0
+                                bufferSize:1024
+                                    format:recordingFormat
+                                     block:^(AVAudioPCMBuffer* buffer, AVAudioTime* when) {
+        [self->recognitionRequest appendAudioPCMBuffer:buffer];
+    }];
+    
+    [audioEngine prepare];
+    [audioEngine startAndReturnError:nil];
 }
 
 - (void)stop {
-    NSLog(@"stop");
     if(!_isRunning) {
         return;
     }
     _isRunning = NO;
     
-    [recognazationTask cancel];
-    [speechRequest endAudio];
+    [recognitionTask cancel];
     [audioEngine stop];
-    recognazationTask = nil;
+    [recognitionRequest endAudio];
+    [audioEngine.inputNode removeTapOnBus:0];
+    recognitionTask = nil;
 }
 
 - (BOOL) isRunning {
     return _isRunning;
+}
+
+- (void)speechRecognizer:(SFSpeechRecognizer *)speechRecognizer availabilityDidChange:(BOOL)available {
+    NSLog(@"available did change: %i", available);
 }
 
 @end
@@ -131,8 +157,8 @@ extern "C" {
     
     void _unitySpeechRecognizerStart(SpeechRecognizerResultCallback callback) {
         [UnitySpeechRecognizerPlugin.shared start:^(NSString * _Nonnull result) {
-            callback(MakeStringCopy(result));
-            //callback(result.UTF8String);
+//            callback(MakeStringCopy(result));
+            callback(result.UTF8String);
         }];
     }
     
